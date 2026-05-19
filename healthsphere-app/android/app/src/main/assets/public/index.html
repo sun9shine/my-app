@@ -3,23 +3,122 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#050c1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="description" content="HealthSphere — منصة الصحة الذكية | The Intelligent Health Platform" />
     <title>HealthSphere | منصة الصحة الذكية</title>
     <link rel="manifest" href="./manifest.json" />
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: #050c1a; color: #dce8ff; font-family: 'Tajawal', sans-serif; overflow-x: hidden; }
-      #root { min-height: 100vh; }
+      *{margin:0;padding:0;box-sizing:border-box;}
+      html{height:100%;background:#050c1a;}
+      body{height:100%;background:#050c1a;color:#dce8ff;font-family:'Tajawal',system-ui,-apple-system,Arial,sans-serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+      #root{min-height:100vh;background:#050c1a;}
+      #splash{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#050c1a 0%,#0a1628 50%,#050c1a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,transform .6s ease;}
+      #splash.hide{opacity:0;transform:scale(1.04);pointer-events:none;}
+      #splash-icon{width:90px;height:90px;border-radius:22px;background:linear-gradient(135deg,#0a1f3a,#122a4a);border:2px solid rgba(0,212,255,0.3);box-shadow:0 0 40px rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:18px;animation:iconPulse 2s ease-in-out infinite;font-size:40px;}
+      @keyframes iconPulse{0%,100%{box-shadow:0 0 40px rgba(0,212,255,0.2);}50%{box-shadow:0 0 60px rgba(0,212,255,0.45);}}
+      #splash-logo{font-size:24px;font-weight:900;color:#dce8ff;margin-bottom:6px;letter-spacing:-.5px;}
+      #splash-sub{font-size:13px;color:#4a6890;margin-bottom:24px;text-align:center;}
+      #splash-bar{width:160px;height:3px;background:#0c1828;border-radius:2px;overflow:hidden;}
+      #splash-fill{height:100%;background:linear-gradient(90deg,#00d4ff,#7c3aed);border-radius:2px;animation:fillBar 1.8s ease-out forwards;}
+      @keyframes fillBar{0%{width:0%}60%{width:70%}100%{width:100%}}
+      #err-screen{display:none;position:fixed;inset:0;background:#050c1a;padding:20px;overflow:auto;z-index:99999;}
+      .err-title{color:#ff4560;font-size:16px;font-weight:700;margin-bottom:10px;}
+      .err-msg{color:#adc8e8;font-size:11px;line-height:1.8;background:#0c1828;padding:12px;border-radius:8px;word-break:break-all;white-space:pre-wrap;max-height:55vh;overflow-y:auto;}
+      .err-btn{margin-top:12px;background:#00d4ff22;border:1px solid #00d4ff44;color:#00d4ff;padding:10px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;width:100%;}
+      @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="./app.js"></script>
   </head>
   <body>
+    <!-- Splash Screen -->
+    <div id="splash">
+      <div id="splash-icon">&#x2695;&#xFE0F;</div>
+      <div id="splash-logo">HealthSphere</div>
+      <div id="splash-sub"></div>
+      <div id="splash-bar"><div id="splash-fill"></div></div>
+    </div>
+    <!-- Error Screen -->
+    <div id="err-screen">
+      <div class="err-title">&#x26A0;&#xFE0F; <span id="err-title-text">Error</span></div>
+      <div class="err-msg" id="err-msg-text"></div>
+      <button class="err-btn" onclick="location.reload()">&#x1F504; <span id="err-btn-text">Reload</span></button>
+    </div>
+    <!-- App Root -->
     <div id="root"></div>
+
+    <script>
+    // Apply saved language BEFORE app loads to prevent flash
+    (function(){
+      var lang = localStorage.getItem('hsp_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      
+      var sub = document.getElementById('splash-sub');
+      var errTitle = document.getElementById('err-title-text');
+      var errBtn = document.getElementById('err-btn-text');
+      
+      if (lang === 'ar') {
+        if (sub) sub.textContent = 'منصة الصحة الذكية';
+        if (errTitle) errTitle.textContent = 'خطأ';
+        if (errBtn) errBtn.textContent = 'إعادة التحميل';
+      } else {
+        if (sub) sub.textContent = 'The Intelligent Health Platform';
+        if (errTitle) errTitle.textContent = 'Error';
+        if (errBtn) errBtn.textContent = 'Reload';
+      }
+    })();
+
+    // Error handling to prevent blank screen
+    function showError(msg) {
+      var s = document.getElementById('splash');
+      var e = document.getElementById('err-screen');
+      if (s) s.style.display = 'none';
+      if (e) e.style.display = 'block';
+      var m = document.getElementById('err-msg-text');
+      if (m) m.textContent = msg;
+    }
+    
+    window.onerror = function(msg, src, line, col, err) {
+      showError('Error: ' + msg + '\nSource: ' + (src || 'unknown') + '\nLine: ' + line + '\n' + (err && err.stack ? err.stack : ''));
+      return true;
+    };
+    
+    window.onunhandledrejection = function(e) {
+      showError('Promise Error: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason)));
+    };
+
+    // Timeout fallback - if app doesn't load in 10s, show error
+    var _splashTimeout = setTimeout(function() {
+      var root = document.getElementById('root');
+      if (root && root.children.length === 0) {
+        showError(localStorage.getItem('hsp_lang') === 'en' 
+          ? 'App failed to load. Please check your connection and try again.' 
+          : 'فشل تحميل التطبيق. يرجى التحقق من الاتصال والمحاولة مرة أخرى.');
+      }
+    }, 10000);
+
+    // Hide splash when app renders
+    var _splashObserver = new MutationObserver(function(mutations) {
+      var root = document.getElementById('root');
+      if (root && root.children.length > 0) {
+        clearTimeout(_splashTimeout);
+        var splash = document.getElementById('splash');
+        if (splash) {
+          splash.classList.add('hide');
+          setTimeout(function() { splash.style.display = 'none'; }, 600);
+        }
+        _splashObserver.disconnect();
+      }
+    });
+    var _rootEl = document.getElementById('root');
+    if (_rootEl) _splashObserver.observe(_rootEl, { childList: true });
+    </script>
+
+    <script type="module" crossorigin src="./app.js"></script>
   </body>
 </html>
