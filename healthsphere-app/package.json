@@ -1,27 +1,30 @@
 {
-  "name": "healthsphere",
+  "name": "healthsphere-app",
   "version": "2.0.0",
+  "description": "HealthSphere - AI-Powered Intelligent Health Platform | منصة الصحة الذكية",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "build:android": "npm run build && npx cap sync android",
-    "open:android": "npx cap open android"
+    "dev": "echo 'Open android/app/src/main/assets/public/index.html in browser'",
+    "build": "mkdir -p dist && cp -r android/app/src/main/assets/public/* dist/",
+    "build:android": "./BUILD.sh",
+    "build:apk": "cd android && ./gradlew assembleDebug && cp app/build/outputs/apk/debug/app-debug.apk ../HealthSphere-debug.apk",
+    "build:aab": "cd android && ./gradlew bundleRelease && cp app/build/outputs/bundle/release/app-release.aab ../HealthSphere-release.aab",
+    "build:ios": "cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release archive",
+    "sync": "npx cap sync",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios"
   },
+  "keywords": ["health", "ai", "medical", "arabic", "bilingual"],
+  "author": "HealthSphere Team",
+  "license": "MIT",
   "dependencies": {
-    "@capacitor/android": "^6.1.0",
-    "@capacitor/camera": "^6.0.0",
-    "@capacitor/core": "^6.1.0",
-    "@capacitor/status-bar": "^6.0.0",
-    "@capacitor/splash-screen": "^6.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@capacitor/core": "^5.0.0",
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/ios": "^5.0.0",
+    "@capacitor/splash-screen": "^5.0.0",
+    "@capacitor/status-bar": "^5.0.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.1.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.8"
+    "@capacitor/cli": "^5.0.0"
   }
 }
